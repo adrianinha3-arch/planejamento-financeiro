@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planejamento Financeiro 2026 - Regra 50/30/20</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Calibri, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #1A1A2E 0%, #16213E 100%);
+            color: #FFFFFF;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #0F3460 0%, #1A1A2E 100%);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            color: #00B4D8;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #B0C4DE;
+            font-size: 1.1em;
+        }
+
+        .storage-bar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .storage-bar:hover {
+            background: rgba(0,0,0,0.7);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn-export {
+            background: #06D6A0;
+        }
+
+        .btn-export:hover {
+            background: #05B386;
+        }
+
+        .btn-import {
+            background: #FFD166;
+            color: #1A1A2E;
+        }
+
+        .btn-import:hover {
+            background: #E6BC5C;
+        }
+
+        .btn-reset {
+            background: #EF476F;
+        }
+
+        .btn-reset:hover {
+            background: #C0355A;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 15px;
+        }
+
+        .tab-btn {
+            background: #0F3460;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .tab-btn:hover, .tab-btn.active {
+            background: #00B4D8;
+            transform: translateY(-2px);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: rgba(22,33,62,0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .card-title {
+            font-size: 1.3em;
+            color: #00B4D8;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #00B4D8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #B0C4DE;
+            font-weight: bold;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #0F3460;
+            background: #0D2137;
+            color: white;
+            font-size: 14px;
+        }
+
+        button {
+            background: #00B4D8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #0096B4;
+            transform: translateY(-2px);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th {
+            background: #0077B6;
+            color: white;
+            padding: 12px 8px;
+            text-align: center;
+        }
+
+        td {
+            padding: 8px;
+            text-align: center;
+            border-bottom: 1px solid #2C3E50;
+        }
+
+        .table-row-dark { background: #0D2137; }
+        .table-row-light { background: #16213E; }
+        .text-left { text-align: left; }
+        .value-positive { color: #06D6A0; font-weight: bold; }
+        .value-negative { color: #EF476F; }
+        .status-ok { color: #06D6A0; }
+        .status-warning { color: #FFD166; }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+
+        .indicators-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .indicator-card {
+            background: linear-gradient(135deg, #0F3460 0%, #1A1A2E 100%);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .indicator-title {
+            font-size: 0.9em;
+            color: #B0C4DE;
+            margin-bottom: 10px;
+        }
+
+        .indicator-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .chart-container {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .action-icons {
+            cursor: pointer;
+            margin: 0 5px;
+            font-size: 18px;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+
+        .action-icons:hover {
+            opacity: 0.7;
+            transform: scale(1.1);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .badge-recorrente { background: #FFD166; color: #1A1A2E; }
+        .badge-parcelado { background: #06D6A0; color: #1A1A2E; }
+        .badge-vista { background: #00B4D8; color: #1A1A2E; }
+        .badge-50 { background: #00B4D8; color: white; }
+        .badge-30 { background: #FFD166; color: #1A1A2E; }
+        .badge-20 { background: #06D6A0; color: white; }
+
+        .section-header {
+            background: #0F3460;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0 10px 0;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #16213E;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .card-selector {
+            background: #0F3460;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card-badge {
+            display: inline-block;
+            background: #00B4D8;
+            padding: 5px 12px;
+            border-radius: 15px;
+            margin: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .card-badge:hover, .card-badge.active {
+            background: #06D6A0;
+            transform: scale(1.05);
+        }
+
+        .delete-card {
+            background: #EF476F;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin-left: 8px;
+            cursor: pointer;
+        }
+
+        .delete-card:hover {
+            background: #C0355A;
+        }
+
+        .quick-add-section {
+            background: #0F3460;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .quick-add-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .btn-quick-50 { background: #00B4D8; }
+        .btn-quick-30 { background: #FFD166; color: #1A1A2E; }
+        .btn-quick-20 { background: #06D6A0; }
+
+        .btn-replicate {
+            background: #9C27B0;
+        }
+
+        .btn-replicate:hover {
+            background: #7B1FA2;
+        }
+
+        .exemplo-box {
+            background: rgba(0,0,0,0.3);
+            border-left: 4px solid #00B4D8;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .exemplo-titulo {
+            color: #FFD166;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .tabs { justify-content: center; }
+            table { font-size: 11px; }
+            .grid-2 { grid-template-columns: 1fr; }
+            .storage-bar { position: static; margin-top: 15px; display: inline-block; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>💰 PLANEJAMENTO FINANCEIRO | 2026</h1>
+        <p>Regra 50/30/20 - Controle de Gastos e Investimentos</p>
+        <div class="storage-bar" id="storageBar" onclick="showStorageInfo()">
+            💾 Calculando espaço...
+        </div>
+        <div class="action-buttons">
+            <button class="btn-export" onclick="exportarDados()">📤 Exportar Dados</button>
+            <button class="btn-import" onclick="document.getElementById('fileInput').click()">📥 Importar Dados</button>
+            <button class="btn-reset" onclick="confirmarReset()">🗑️ Resetar Dados</button>
+        </div>
+        <input type="file" id="fileInput" class="file-input" accept=".json" onchange="importarDados(this.files[0])">
+    </div>
+
+    <div class="tabs" id="tabs"></div>
+    <div id="content"></div>
+</div>
+
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <h3 id="modalTitle">Aviso</h3>
+        <p id="modalMessage">Mensagem</p>
+        <button onclick="fecharModal()" style="margin-top: 20px;">Fechar</button>
+    </div>
+</div>
+
+<script>
+    const STORAGE_KEYS = {
+        CREDIT_CARDS: 'credit_cards_data',
+        CREDIT_CARD_EXPENSES: 'credit_card_expenses',
+        MONTHLY_DATA: 'monthly_data_50_30_20',
+        INVESTMENTS: 'investments_complete'
+    };
+
+    const MONTHS = ["JAN","FEV","MAR","ABR","MAI","JUN","JUL","AGO","SET","OUT","NOV","DEZ"];
+    const MONTH_NAMES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+                         "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+
+    let creditCards = [];
+    let creditCardExpenses = [];
+    let monthlyData = {};
+    let investments = {
+        fiis: [],
+        acoes: [],
+        tesouro_direto: []
+    };
+    let selectedCardId = null;
+    let currentMonthIndex = 0;
+
+    function mostrarModal(titulo, mensagem, isErro = false) {
+        const modal = document.getElementById('modal');
+        const title = document.getElementById('modalTitle');
+        const message = document.getElementById('modalMessage');
+        if (!modal) return;
+        title.textContent = titulo;
+        message.textContent = mensagem;
+        title.style.color = isErro ? '#EF476F' : '#06D6A0';
+        modal.style.display = 'flex';
+    }
+
+    function fecharModal() {
+        const modal = document.getElementById('modal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    function showToast(mensagem, tipo = 'sucesso') {
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: ${tipo === 'erro' ? '#EF476F' : '#06D6A0'};
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            z-index: 1001;
+            animation: fadeIn 0.3s ease-out;
+            font-weight: bold;
+        `;
+        toast.textContent = mensagem;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+
+    function calcularTamanhoStorage() {
+        let total = 0;
+        for (let key in localStorage) {
+            if (localStorage.hasOwnProperty(key)) {
+                total += localStorage[key].length;
+            }
+        }
+        return total;
+    }
+
+    function formatarTamanho(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    function atualizarStorageBar() {
+        const tamanho = calcularTamanhoStorage();
+        const percentual = (tamanho / (5 * 1024 * 1024)) * 100;
+        const bar = document.getElementById('storageBar');
+        if (bar) {
+            bar.innerHTML = `💾 Usado: ${formatarTamanho(tamanho)} de ~5MB`;
+            if (percentual > 80) {
+                bar.style.background = '#EF476F';
+            } else if (percentual > 50) {
+                bar.style.background = '#FFD166';
+            } else {
+                bar.style.background = '#06D6A0';
+            }
+        }
+    }
+
+    function showStorageInfo() {
+        const tamanho = calcularTamanhoStorage();
+        const percentual = (tamanho / (5 * 1024 * 1024)) * 100;
+        let status = percentual > 80 ? '⚠️ Crítico! Faça backup.' : (percentual > 50 ? '⚠️ Moderado.' : '✅ Saudável.');
+        alert(`💾 Armazenamento\nUsado: ${formatarTamanho(tamanho)}\nLimite: ~5 MB\nUtilização: ${percentual.toFixed(1)}%\n\n${status}`);
+    }
+
+    function exportarDados() {
+        const dados = {
+            versao: "2.0",
+            data_exportacao: new Date().toISOString(),
+            creditCards: creditCards,
+            creditCardExpenses: creditCardExpenses,
+            monthlyData: monthlyData,
+            investments: investments
+        };
+        
+        const jsonStr = JSON.stringify(dados, null, 2);
+        const blob = new Blob([jsonStr], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const data = new Date();
+        const nomeArquivo = `backup_financeiro_${data.getFullYear()}-${(data.getMonth()+1).toString().padStart(2,'0')}-${data.getDate().toString().padStart(2,'0')}.json`;
+        a.href = url;
+        a.download = nomeArquivo;
+        a.click();
+        URL.revokeObjectURL(url);
+        mostrarModal('✅ Backup Realizado', `Arquivo "${nomeArquivo}" salvo com sucesso!`);
+    }
+
+    function importarDados(file) {
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const dados = JSON.parse(e.target.result);
+                
+                if (!dados.creditCardExpenses || !dados.monthlyData || !dados.investments) {
+                    throw new Error('Arquivo inválido. Estrutura não reconhecida.');
+                }
+                
+                if (confirm('⚠️ ATENÇÃO: Isso irá SUBSTITUIR todos os dados atuais!\n\nDeseja continuar?')) {
+                    creditCards = dados.creditCards || [];
+                    creditCardExpenses = dados.creditCardExpenses;
+                    monthlyData = dados.monthlyData;
+                    investments = dados.investments;
+                    
+                    if (creditCards.length > 0 && creditCards[0].id) {
+                        selectedCardId = creditCards[0].id;
+                    } else if (creditCards.length === 0) {
+                        adicionarCartaoPadrao();
+                    }
+                    
+                    saveAllData();
+                    refreshCurrentTab();
+                    atualizarStorageBar();
+                    
+                    mostrarModal('✅ Importação Concluída', `Dados importados com sucesso!\nCartões: ${creditCards.length}\nGastos: ${creditCardExpenses.length} itens`);
+                }
+            } catch (error) {
+                mostrarModal('❌ Erro na Importação', `Não foi possível importar: ${error.message}`, true);
+            }
+        };
+        reader.readAsText(file);
+        document.getElementById('fileInput').value = '';
+    }
+
+    function confirmarReset() {
+        if (confirm('⚠️ ATENÇÃO! Isso irá APAGAR TODOS os dados!\n\nTem certeza absoluta?')) {
+            if (confirm('ÚLTIMA CONFIRMAÇÃO: Todos os dados serão perdidos.')) {
+                resetarTodosDados();
+            }
+        }
+    }
+
+    function resetarTodosDados() {
+        localStorage.removeItem(STORAGE_KEYS.CREDIT_CARDS);
+        localStorage.removeItem(STORAGE_KEYS.CREDIT_CARD_EXPENSES);
+        localStorage.removeItem(STORAGE_KEYS.MONTHLY_DATA);
+        localStorage.removeItem(STORAGE_KEYS.INVESTMENTS);
+        
+        loadInitialData();
+        saveAllData();
+        refreshCurrentTab();
+        atualizarStorageBar();
+        
+        mostrarModal('🔄 Dados Resetados', 'Todos os dados foram resetados para os valores padrão.');
+    }
+
+    function adicionarCartaoPadrao() {
+        creditCards = [];
+        const cartao1 = { id: Date.now(), nome: "Cartão Principal", limite: 5000, fechamento: 10, vencimento: 25 };
+        const cartao2 = { id: Date.now() + 1, nome: "Cartão Secundário", limite: 3000, fechamento: 15, vencimento: 30 };
+        creditCards.push(cartao1, cartao2);
+        selectedCardId = cartao1.id;
+    }
+
+    function adicionarCartao() {
+        const nome = prompt("Nome do cartão:", "Novo Cartão");
+        if (!nome) return;
+        const limite = parseFloat(prompt("Limite do cartão (R$):", "5000"));
+        const fechamento = parseInt(prompt("Dia de fechamento da fatura:", "10"));
+        const vencimento = parseInt(prompt("Dia de vencimento:", "25"));
+        
+        const novoCartao = {
+            id: Date.now(),
+            nome: nome,
+            limite: isNaN(limite) ? 5000 : limite,
+            fechamento: isNaN(fechamento) ? 10 : fechamento,
+            vencimento: isNaN(vencimento) ? 25 : vencimento
+        };
+        creditCards.push(novoCartao);
+        if (creditCards.length === 1) selectedCardId = novoCartao.id;
+        saveAllData();
+        refreshCurrentTab();
+        showToast(`Cartão "${nome}" adicionado!`);
+    }
+
+    function excluirCartao(cardId) {
+        if (creditCards.length <= 1) {
+            showToast("É necessário manter pelo menos um cartão!", "erro");
+            return;
+        }
+        if (confirm("Excluir este cartão? Todas as compras associadas serão removidas.")) {
+            creditCards = creditCards.filter(c => c.id !== cardId);
+            creditCardExpenses = creditCardExpenses.filter(e => e.cartaoId !== cardId);
+            if (selectedCardId === cardId && creditCards.length > 0) {
+                selectedCardId = creditCards[0].id;
+            }
+            saveAllData();
+            refreshCurrentTab();
+            showToast("Cartão excluído!");
+        }
+    }
+
+    function getDefaultMonthlyData(mes) {
+        return {
+            receita: mes === "JAN" ? 6384.01 : (mes === "FEV" ? 7081.81 : (mes === "JUL" ? 11426.60 : (mes === "DEZ" ? 9528.85 : 6631.81))),
+            necessidades: [],   // 50% - antigo obrig_fixas + obrig_var
+            desejos: [],        // 30% - antigo nao_obrig_fixas + nao_obrig_var + eventuais
+            investimentos: []   // 20% - investimentos
+        };
+    }
+
+    function loadInitialData() {
+        const savedCards = localStorage.getItem(STORAGE_KEYS.CREDIT_CARDS);
+        if (savedCards) {
+            creditCards = JSON.parse(savedCards);
+            const savedSelected = localStorage.getItem('selected_card_id');
+            selectedCardId = savedSelected ? parseInt(savedSelected) : (creditCards[0]?.id || null);
+        } else {
+            adicionarCartaoPadrao();
+        }
+
+        const savedCardExpenses = localStorage.getItem(STORAGE_KEYS.CREDIT_CARD_EXPENSES);
+        if (savedCardExpenses) {
+            creditCardExpenses = JSON.parse(savedCardExpenses);
+        } else {
+            const cartaoId = creditCards[0]?.id || Date.now();
+            creditCardExpenses = [
+                { id: Date.now() + 1, cartaoId: cartaoId, nome: "Notebook (Trabalho)", valor: 3500, tipo: "parcelado", parcelas: 6, parcelaAtual: 1, dataInicio: "2026-01", categoria: "investimento" },
+                { id: Date.now() + 2, cartaoId: cartaoId, nome: "Netflix", valor: 45.90, tipo: "recorrente", parcelas: 0, parcelaAtual: 0, dataInicio: "2026-01", categoria: "desejo" },
+                { id: Date.now() + 3, cartaoId: cartaoId, nome: "Mercado", valor: 850, tipo: "vista", parcelas: 0, parcelaAtual: 0, dataInicio: "2026-01", categoria: "necessidade" }
+            ];
+        }
+
+        const savedMonthly = localStorage.getItem(STORAGE_KEYS.MONTHLY_DATA);
+        if (savedMonthly) {
+            monthlyData = JSON.parse(savedMonthly);
+        } else {
+            MONTHS.forEach(m => {
+                monthlyData[m] = getDefaultMonthlyData(m);
+            });
+            
+            // Dados de exemplo para Janeiro
+            monthlyData["JAN"].necessidades = [
+                { nome: "Aluguel", valor: 1500 },
+                { nome: "Mercado", valor: 800 },
+                { nome: "Conta de Luz", valor: 120 },
+                { nome: "Transporte", valor: 300 }
+            ];
+            monthlyData["JAN"].desejos = [
+                { nome: "Netflix/Streaming", valor: 90 },
+                { nome: "Restaurante", valor: 250 },
+                { nome: "Cinema", valor: 60 },
+                { nome: "Roupas", valor: 200 }
+            ];
+            monthlyData["JAN"].investimentos = [
+                { nome: "Curso Profissionalizante", valor: 200 },
+                { nome: "Ações", valor: 300 }
+            ];
+            
+            // Dados de exemplo para Fevereiro
+            monthlyData["FEV"].necessidades = [
+                { nome: "Aluguel", valor: 1500 },
+                { nome: "Mercado", valor: 750 },
+                { nome: "Conta de Luz", valor: 115 }
+            ];
+            monthlyData["FEV"].desejos = [
+                { nome: "Streaming", valor: 90 },
+                { nome: "Viagem", valor: 500 }
+            ];
+            monthlyData["FEV"].investimentos = [
+                { nome: "Tesouro Direto", valor: 400 }
+            ];
+        }
+
+        const savedInv = localStorage.getItem(STORAGE_KEYS.INVESTMENTS);
+        if (savedInv) {
+            investments = JSON.parse(savedInv);
+        } else {
+            investments = {
+                fiis: [{ nome: "HGBS11", quantidade: 100, preco_medio: 98.50, valor_atual: 102.30 }],
+                acoes: [{ nome: "PETR4", quantidade: 200, preco_medio: 32.50, valor_atual: 36.80 }],
+                tesouro_direto: [{ nome: "Tesouro Selic 2029", valor_investido: 5000, valor_atual: 5230 }]
+            };
+        }
+    }
+
+    function saveAllData() {
+        localStorage.setItem(STORAGE_KEYS.CREDIT_CARDS, JSON.stringify(creditCards));
+        localStorage.setItem(STORAGE_KEYS.CREDIT_CARD_EXPENSES, JSON.stringify(creditCardExpenses));
+        localStorage.setItem(STORAGE_KEYS.MONTHLY_DATA, JSON.stringify(monthlyData));
+        localStorage.setItem(STORAGE_KEYS.INVESTMENTS, JSON.stringify(investments));
+        if (selectedCardId) localStorage.setItem('selected_card_id', selectedCardId.toString());
+        atualizarStorageBar();
+    }
+
+    function getParcelasMes(mes, ano = 2026, cartaoId = null) {
+        const mesNum = MONTHS.indexOf(mes) + 1;
+        const dataReferencia = `${ano}-${mesNum.toString().padStart(2,'0')}`;
+        let total = 0;
+        let detalhes = [];
+        const filteredExpenses = cartaoId ? creditCardExpenses.filter(e => e.cartaoId === cartaoId) : creditCardExpenses;
+
+        filteredExpenses.forEach(expense => {
+            const dataInicio = expense.dataInicio;
+            if (expense.tipo === 'vista') {
+                if (dataInicio === dataReferencia) {
+                    total += expense.valor;
+                    detalhes.push({ ...expense, valorParcela: expense.valor });
+                }
+            } else if (expense.tipo === 'parcelado') {
+                const [anoIni, mesIni] = dataInicio.split('-').map(Number);
+                const parcelaInicio = (anoIni - ano) * 12 + (mesIni - mesNum);
+                if (parcelaInicio >= 0 && parcelaInicio < expense.parcelas) {
+                    const valorParcela = expense.valor / expense.parcelas;
+                    total += valorParcela;
+                    detalhes.push({ ...expense, valorParcela, parcelaNum: parcelaInicio + 1 });
+                }
+            } else if (expense.tipo === 'recorrente') {
+                total += expense.valor;
+                detalhes.push({ ...expense, valorParcela: expense.valor });
+            }
+        });
+        return { total, detalhes };
+    }
+
+    function getTotalGastosCartaoMes(mes, cartaoId = null) {
+        if (cartaoId) return getParcelasMes(mes, 2026, cartaoId).total;
+        let totalGeral = 0;
+        creditCards.forEach(card => {
+            totalGeral += getParcelasMes(mes, 2026, card.id).total;
+        });
+        return totalGeral;
+    }
+
+    function getTotalByCategory(mes, categoria) {
+        if (!monthlyData[mes]) return 0;
+        const items = monthlyData[mes][categoria] || [];
+        return items.reduce((sum, item) => sum + (item.valor || 0), 0);
+    }
+
+    function getReceita(mes) { return monthlyData[mes]?.receita || 0; }
+    function getTotalNecessidades(mes) { return getTotalByCategory(mes, 'necessidades'); }
+    function getTotalDesejos(mes) { return getTotalByCategory(mes, 'desejos'); }
+    function getTotalInvestimentosMensal(mes) { return getTotalByCategory(mes, 'investimentos'); }
+    function getTotalDespesasMes(mes) { return getTotalNecessidades(mes) + getTotalDesejos(mes) + getTotalInvestimentosMensal(mes) + getTotalGastosCartaoMes(mes); }
+    function getSaldo(mes) { return getReceita(mes) - getTotalDespesasMes(mes); }
+
+    function formatCurrency(v) { return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v||0); }
+    function formatPercent(v) { return new Intl.NumberFormat('pt-BR',{style:'percent',minimumFractionDigits:1}).format(v); }
+
+    function renderCartaoSelector() {
+        if (!creditCards.length) return '';
+        
+        let html = `<div class="card-selector"><strong>💳 Selecione o Cartão:</strong><br>`;
+        creditCards.forEach(card => {
+            const activeClass = selectedCardId === card.id ? 'active' : '';
+            html += `<div class="card-badge ${activeClass}" onclick="selecionarCartao(${card.id})">
+                        ${card.nome} (Limite: ${formatCurrency(card.limite)})
+                        <span class="delete-card" onclick="event.stopPropagation(); excluirCartao(${card.id})">✖</span>
+                    </div>`;
+        });
+        html += `<button onclick="adicionarCartao()" style="margin-left: 10px; padding: 5px 10px;">+ Novo Cartão</button></div>`;
+        return html;
+    }
+
+    window.selecionarCartao = function(cardId) {
+        selectedCardId = cardId;
+        saveAllData();
+        refreshCurrentTab();
+    };
+
+    window.adicionarItemRapido = function(mes, tipo) {
+        let categoria = '';
+        let titulo = '';
+        let percentual = '';
+        
+        switch(tipo) {
+            case '50':
+                categoria = 'necessidades';
+                titulo = 'Necessidades';
+                percentual = '50%';
+                break;
+            case '30':
+                categoria = 'desejos';
+                titulo = 'Desejos';
+                percentual = '30%';
+                break;
+            case '20':
+                categoria = 'investimentos';
+                titulo = 'Investimentos';
+                percentual = '20%';
+                break;
+        }
+        
+        const nome = prompt(`📝 ${titulo} (${percentual})\n\nDigite a descrição do gasto/investimento:`);
+        if (!nome || !nome.trim()) return;
+        
+        const valor = parseFloat(prompt(`💰 ${titulo}\n\nDigite o valor para "${nome}":`, "0"));
+        if (isNaN(valor) || valor <= 0) {
+            showToast("Valor inválido!", "erro");
+            return;
+        }
+        
+        if (!monthlyData[mes]) monthlyData[mes] = getDefaultMonthlyData(mes);
+        if (!monthlyData[mes][categoria]) monthlyData[mes][categoria] = [];
+        monthlyData[mes][categoria].push({ nome: nome.trim(), valor: valor });
+        saveAllData();
+        refreshCurrentTab();
+        showToast(`✅ "${nome}" adicionado em ${titulo} (${percentual})!`);
+    };
+
+    window.replicarParaProximoMes = function(mesAtual) {
+        const currentIndex = MONTHS.indexOf(mesAtual);
+        if (currentIndex === -1 || currentIndex === MONTHS.length - 1) {
+            showToast("Este é o último mês do ano! Não é possível replicar para frente.", "erro");
+            return;
+        }
+        
+        const proximoMes = MONTHS[currentIndex + 1];
+        const mesAtualNome = MONTH_NAMES[currentIndex];
+        const proximoMesNome = MONTH_NAMES[currentIndex + 1];
+        
+        if (!confirm(`📋 Replicar gastos de ${mesAtualNome} para ${proximoMesNome}?\n\nIsso irá COPIAR todos os itens das categorias:\n• Necessidades (50%)\n• Desejos (30%)\n• Investimentos (20%)\n\nOs dados existentes em ${proximoMesNome} serão MANTIDOS e os novos serão ADICIONADOS.`)) {
+            return;
+        }
+        
+        if (!monthlyData[proximoMes]) monthlyData[proximoMes] = getDefaultMonthlyData(proximoMes);
+        
+        const categorias = ['necessidades', 'desejos', 'investimentos'];
+        let totalCopiados = 0;
+        
+        categorias.forEach(cat => {
+            const itensOrigem = monthlyData[mesAtual][cat] || [];
+            if (itensOrigem.length > 0) {
+                if (!monthlyData[proximoMes][cat]) monthlyData[proximoMes][cat] = [];
+                itensOrigem.forEach(item => {
+                    monthlyData[proximoMes][cat].push({ ...item });
+                    totalCopiados++;
+                });
+            }
+        });
+        
+        saveAllData();
+        refreshCurrentTab();
+        showToast(`📋 Replicação concluída! ${totalCopiados} itens copiados para ${proximoMesNome}.`);
+    };
+
+    window.excluirItemGlobal = function(mes, categoria, idx) {
+        if (confirm('🗑️ Tem certeza que deseja excluir este item permanentemente?')) {
+            if (monthlyData[mes] && monthlyData[mes][categoria] && monthlyData[mes][categoria][idx]) {
+                monthlyData[mes][categoria].splice(idx, 1);
+                saveAllData();
+                refreshCurrentTab();
+                showToast("✅ Item excluído com sucesso!");
+            } else {
+                showToast("❌ Erro ao excluir: item não encontrado", "erro");
+            }
+        }
+    };
+
+    window.editarItemGlobal = function(mes, categoria, idx, nomeAtual, valorAtual) {
+        const novoNome = prompt('✏️ Editar descrição:', nomeAtual);
+        if (novoNome && novoNome.trim()) {
+            const novoValor = prompt('✏️ Editar valor (R$):', valorAtual);
+            if (novoValor && !isNaN(parseFloat(novoValor))) {
+                if (monthlyData[mes] && monthlyData[mes][categoria] && monthlyData[mes][categoria][idx]) {
+                    monthlyData[mes][categoria][idx].nome = novoNome.trim();
+                    monthlyData[mes][categoria][idx].valor = parseFloat(novoValor);
+                    saveAllData();
+                    refreshCurrentTab();
+                    showToast("✏️ Item atualizado com sucesso!");
+                }
+            } else {
+                showToast("❌ Valor inválido!", "erro");
+            }
+        }
+    };
+
+    function renderEditableTable(mes, categoria, titulo, cor, badge, exemplos = []) {
+        const items = monthlyData[mes][categoria] || [];
+        let html = `<div class="card"><div class="card-title" style="color: ${cor}">
+                        <span>✏️ ${titulo} <span class="badge ${badge}">${badge}</span></span>
+                    </div>`;
+        
+        // Mostrar exemplos se for o guia
+        if (exemplos.length > 0) {
+            html += `<div class="exemplo-box">
+                        <div class="exemplo-titulo">💡 Exemplos de ${titulo}:</div>
+                        <div>${exemplos.join(' • ')}</div>
+                     </div>`;
+        }
+        
+        html += `<div class="scrollable-table">
+                    <table>
+                        <thead>
+                            <tr><th>Descrição</th><th>Valor (R$)</th><th>Ações</th></tr>
+                        </thead>
+                        <tbody>`;
+        
+        items.forEach((item, idx) => {
+            const rowClass = idx % 2 === 0 ? 'table-row-dark' : 'table-row-light';
+            html += `<tr class="${rowClass}">
+                        <td class="text-left">${escapeHtml(item.nome)}</td>
+                        <td>${formatCurrency(item.valor)}</td>
+                        <td>
+                            <button class="action-icons" onclick="editarItemGlobal('${mes}', '${categoria}', ${idx}, '${escapeHtml(item.nome).replace(/'/g, "\\'")}', '${item.valor}')" style="background:none; padding:0; margin:0 5px;">✏️</button>
+                            <button class="action-icons" onclick="excluirItemGlobal('${mes}', '${categoria}', ${idx})" style="background:none; padding:0; margin:0 5px;">🗑️</button>
+                        </td>
+                       </tr>`;
+        });
+        
+        html += `<tr class="table-row-dark">
+                    <td colspan="3">
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="novo_nome_${categoria}_${mes}" placeholder="Descrição" style="flex:2">
+                            <input type="number" id="novo_valor_${categoria}_${mes}" placeholder="Valor" style="flex:1" step="0.01">
+                            <button onclick="adicionarItem('${mes}','${categoria}')">+ Adicionar</button>
+                        </div>
+                    </td>
+                   </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>`;
+        return html;
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        return String(text).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    function renderDetalhamentoMensal(mes, mesNome) {
+        if (!monthlyData[mes]) monthlyData[mes] = getDefaultMonthlyData(mes);
+        const receita = getReceita(mes);
+        const gastosCartao = getTotalGastosCartaoMes(mes);
+        const necessidades = getTotalNecessidades(mes);
+        const desejos = getTotalDesejos(mes);
+        const investimentos = getTotalInvestimentosMensal(mes);
+        const saldo = getSaldo(mes);
+        
+        const mesIndex = MONTHS.indexOf(mes);
+        const proximoMesNome = mesIndex < MONTHS.length - 1 ? MONTH_NAMES[mesIndex + 1] : 'próximo mês';
+        
+        let html = `<div class="card">
+                        <div class="card-title">💰 ${mesNome.toUpperCase()} — Planejamento Financeiro</div>
+                        <div class="form-group">
+                            <label>💰 Receita do Mês</label>
+                            <input type="number" id="receita_${mes}" value="${receita}" step="0.01" onchange="atualizarReceita('${mes}', this.value)" style="width: 300px;">
+                        </div>
+                    </div>
+                    
+                    <div class="quick-add-section">
+                        <div class="card-title" style="margin-bottom: 15px;">⚡ INSERÇÃO RÁPIDA POR CATEGORIA</div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                            <div style="background: #00B4D8; border-radius: 10px; padding: 15px; text-align: center;">
+                                <div style="font-size: 1.5em; font-weight: bold;">50%</div>
+                                <div style="font-size: 0.8em; margin-bottom: 10px;">Necessidades</div>
+                                <button class="btn-quick-50" onclick="adicionarItemRapido('${mes}', '50')" style="width: 100%;">➕ Adicionar</button>
+                            </div>
+                            <div style="background: #FFD166; border-radius: 10px; padding: 15px; text-align: center; color: #1A1A2E;">
+                                <div style="font-size: 1.5em; font-weight: bold;">30%</div>
+                                <div style="font-size: 0.8em; margin-bottom: 10px;">Desejos</div>
+                                <button class="btn-quick-30" onclick="adicionarItemRapido('${mes}', '30')" style="width: 100%;">➕ Adicionar</button>
+                            </div>
+                            <div style="background: #06D6A0; border-radius: 10px; padding: 15px; text-align: center;">
+                                <div style="font-size: 1.5em; font-weight: bold;">20%</div>
+                                <div style="font-size: 0.8em; margin-bottom: 10px;">Investimentos</div>
+                                <button class="btn-quick-20" onclick="adicionarItemRapido('${mes}', '20')" style="width: 100%;">➕ Adicionar</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-add-section" style="background: #9C27B0;">
+                        <div class="card-title" style="margin-bottom: 15px;">🔄 REPLICAÇÃO ENTRE MESES</div>
+                        <div style="text-align: center;">
+                            <button class="btn-replicate" onclick="replicarParaProximoMes('${mes}')" style="background: white; color: #9C27B0;">
+                                📋 Replicar todos os itens para ${proximoMesNome}
+                            </button>
+                            <p style="font-size: 11px; margin-top: 10px; opacity: 0.7;">Copia Necessidades, Desejos e Investimentos para o mês seguinte</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-title">💳 GASTOS NO CARTÃO DE CRÉDITO - PROJEÇÃO</div>
+                        <div class="indicators-grid">
+                            <div class="indicator-card">
+                                <div class="indicator-title">Total do Cartão</div>
+                                <div class="indicator-value">${formatCurrency(gastosCartao)}</div>
+                                <div>${formatPercent(gastosCartao/receita)} da receita</div>
+                                <div style="font-size: 11px; margin-top: 5px;">*Distribuído entre 50%, 30% e 20%</div>
+                            </div>
+                        </div>
+                    </div>`;
+        
+        // Exemplos práticos para cada categoria
+        const exemplosNecessidades = ["🏠 Aluguel", "🛒 Mercado", "💡 Contas de água/luz", "🚗 Combustível", "🏥 Plano de saúde", "📚 Escola/Universidade"];
+        const exemplosDesejos = ["📺 Netflix/Streaming", "🍔 Restaurantes", "✈️ Viagens", "🎬 Cinema/Teatro", "👕 Roupas", "🎮 Lazer"];
+        const exemplosInvestimentos = ["📚 Cursos", "💎 Ações/FIIs", "🏦 Tesouro Direto", "💻 Equipamentos p/ trabalho", "📖 Livros técnicos"];
+        
+        html += renderEditableTable(mes, 'necessidades', 'Necessidades (50%)', '#00B4D8', '50%', exemplosNecessidades);
+        html += renderEditableTable(mes, 'desejos', 'Desejos (30%)', '#FFD166', '30%', exemplosDesejos);
+        html += renderEditableTable(mes, 'investimentos', 'Investimentos (20%)', '#06D6A0', '20%', exemplosInvestimentos);
+        
+        html += `<div class="card">
+                    <div class="card-title">📊 ANÁLISE 50/30/20 - ${mesNome}</div>
+                    <div class="indicators-grid">
+                        <div class="indicator-card">
+                            <div class="indicator-title">Necessidades (50%)</div>
+                            <div class="indicator-value">${formatCurrency(necessidades)}</div>
+                            <div>${formatPercent(necessidades/receita)} da receita</div>
+                            <div>Meta: 50% (${formatCurrency(receita * 0.5)})</div>
+                            <div class="${necessidades <= receita * 0.5 ? 'status-ok' : 'status-warning'}">${necessidades <= receita * 0.5 ? '✅ OK' : '⚠️ Acima da meta'}</div>
+                        </div>
+                        <div class="indicator-card">
+                            <div class="indicator-title">Desejos (30%)</div>
+                            <div class="indicator-value">${formatCurrency(desejos)}</div>
+                            <div>${formatPercent(desejos/receita)} da receita</div>
+                            <div>Meta: 30% (${formatCurrency(receita * 0.3)})</div>
+                            <div class="${desejos <= receita * 0.3 ? 'status-ok' : 'status-warning'}">${desejos <= receita * 0.3 ? '✅ OK' : '⚠️ Acima da meta'}</div>
+                        </div>
+                        <div class="indicator-card">
+                            <div class="indicator-title">Investimentos (20%)</div>
+                            <div class="indicator-value">${formatCurrency(investimentos)}</div>
+                            <div>${formatPercent(investimentos/receita)} da receita</div>
+                            <div>Meta: 20% (${formatCurrency(receita * 0.2)})</div>
+                            <div class="${investimentos >= receita * 0.2 ? 'status-ok' : 'status-warning'}">${investimentos >= receita * 0.2 ? '✅ OK' : '⚠️ Abaixo da meta'}</div>
+                        </div>
+                    </div>
+                    <div class="section-header" style="background: ${saldo >= 0 ? '#06D6A0' : '#EF476F'}; text-align: center; margin-top: 20px;">💰 SALDO DO MÊS: ${formatCurrency(saldo)}</div>
+                </div>`;
+        return html;
+    }
+
+    function renderCreditCardManager() {
+        if (!selectedCardId && creditCards.length > 0) selectedCardId = creditCards[0].id;
+        const cartaoAtual = creditCards.find(c => c.id === selectedCardId);
+        
+        let html = renderCartaoSelector();
+        html += `<div class="card">
+                    <div class="card-title">💳 GERENCIADOR DE GASTOS - ${cartaoAtual?.nome || 'Cartão Selecionado'}</div>
+                    <div class="grid-2">
+                        <div>
+                            <h3 style="margin-bottom: 15px;">➕ Nova Compra</h3>
+                            <div class="form-group"><label>Descrição</label><input type="text" id="nova_descricao" placeholder="Ex: Celular, Viagem..."></div>
+                            <div class="form-group"><label>Valor Total (R$)</label><input type="number" id="novo_valor" step="0.01"></div>
+                            <div class="form-group"><label>Tipo</label><select id="novo_tipo" onchange="toggleParcelas()"><option value="vista">À Vista</option><option value="parcelado">Parcelado</option><option value="recorrente">Recorrente</option></select></div>
+                            <div class="form-group" id="parcelas_group" style="display:none"><label>Parcelas</label><select id="novo_parcelas">${Array.from({length:12},(_,i)=>`<option value="${i+2}">${i+2}x</option>`)}</select></div>
+                            <div class="form-group"><label>Mês Início</label><select id="novo_mes_inicio">${MONTHS.map((m,i)=>`<option value="2026-${(i+1).toString().padStart(2,'0')}">${MONTH_NAMES[i]} 2026</option>`).join('')}</select></div>
+                            <div class="form-group"><label>Categoria (50/30/20)</label><select id="nova_categoria">
+                                <option value="necessidade">🏠 Necessidade (50%)</option>
+                                <option value="desejo">🎯 Desejo (30%)</option>
+                                <option value="investimento">💰 Investimento (20%)</option>
+                            </select></div>
+                            <button onclick="adicionarCompraCartao()">➕ Adicionar</button>
+                        </div>
+                        <div>
+                            <h3>📊 Resumo do Cartão</h3>
+                            <div class="indicators-grid">
+                                <div class="indicator-card"><div class="indicator-title">Limite</div><div class="indicator-value">${formatCurrency(cartaoAtual?.limite || 0)}</div></div>
+                                <div class="indicator-card"><div class="indicator-title">Parcelas Ativas</div><div class="indicator-value">${formatCurrency(creditCardExpenses.filter(e=>e.cartaoId===selectedCardId && e.tipo==='parcelado' && e.parcelaAtual<e.parcelas).reduce((s,e)=>s+(e.valor/e.parcelas),0))}</div></div>
+                                <div class="indicator-card"><div class="indicator-title">Recorrentes</div><div class="indicator-value">${formatCurrency(creditCardExpenses.filter(e=>e.cartaoId===selectedCardId && e.tipo==='recorrente').reduce((s,e)=>s+e.valor,0))}</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📋 COMPRAS DO ${cartaoAtual?.nome?.toUpperCase() || 'CARTÃO'}</div>
+                    <div class="scrollable-table">
+                        <table>
+                            <thead>
+                                <tr><th>Descrição</th><th>Total</th><th>Tipo</th><th>Mensal</th><th>Início</th><th>Status</th><th>Categoria</th><th>Ações</th></tr>
+                            </thead>
+                            <tbody>${creditCardExpenses.filter(e => e.cartaoId === selectedCardId).map((e) => {
+                                const vm = e.tipo==='parcelado'?e.valor/e.parcelas:e.valor;
+                                let status = e.tipo==='parcelado'?`${e.parcelaAtual}/${e.parcelas}`:(e.tipo==='recorrente'?'Ativo':'Pago');
+                                const tipoClass = e.tipo==='recorrente'?'badge-recorrente':(e.tipo==='parcelado'?'badge-parcelado':'badge-vista');
+                                const tipoLabel = e.tipo==='recorrente'?'🔄 Recorrente':(e.tipo==='parcelado'?'📦 Parcelado':'✅ À Vista');
+                                const categoriaLabel = e.categoria === 'necessidade' ? '🏠 50%' : (e.categoria === 'desejo' ? '🎯 30%' : '💰 20%');
+                                return `<tr>
+                                            <td class="text-left">${escapeHtml(e.nome)}</td>
+                                            <td>${formatCurrency(e.valor)}</td>
+                                            <td><span class="badge ${tipoClass}">${tipoLabel}</span></td>
+                                            <td>${formatCurrency(vm)}</td>
+                                            <td>${e.dataInicio}</td>
+                                            <td>${status}</td>
+                                            <td>${categoriaLabel}</td>
+                                            <td>
+                                                <span class="action-icons" onclick="editarCompraCartao(${e.id})">✏️</span>
+                                                <span class="action-icons" onclick="excluirCompraCartao(${e.id})">🗑️</span>
+                                            </td>
+                                           </tr>`;
+                            }).join('') || '<tr><td colspan="8">Nenhuma compra neste cartão</td></tr>'}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>`;
+        return html;
+    }
+
+    function renderProjecaoMensal() {
+        let html = `<div class="card">
+                        <div class="card-title">📊 PROJEÇÃO MENSAL - TODOS OS CARTÕES</div>
+                        <div class="chart-container"><canvas id="cardProjectionChart"></canvas></div>
+                        <div class="scrollable-table">
+                            <table>
+                                <thead><tr><th>Mês</th><th>Total</th><th>Detalhes por Cartão</th></tr></thead>
+                                <tbody>`;
+        
+        const projectionData = [];
+        for (let i = 0; i < MONTHS.length; i++) {
+            const mes = MONTHS[i];
+            let totalGeral = 0;
+            let detalhesCards = [];
+            creditCards.forEach(card => {
+                const { total } = getParcelasMes(mes, 2026, card.id);
+                totalGeral += total;
+                if (total > 0) detalhesCards.push(`${card.nome}: ${formatCurrency(total)}`);
+            });
+            projectionData.push(totalGeral);
+            html += `<tr>
+                        <td>${MONTH_NAMES[i]}</td>
+                        <td class="value-positive">${formatCurrency(totalGeral)}</td>
+                        <td class="text-left">${detalhesCards.join(' | ') || '-'}</td>
+                       </tr>`;
+        }
+        html += `</tbody></table></div></div>`;
+        return { html, projectionData };
+    }
+
+    function renderResumoAnual() {
+        const receitas = MONTHS.map(m=>getReceita(m));
+        const cartao = MONTHS.map(m=>getTotalGastosCartaoMes(m));
+        const necessidades = MONTHS.map(m=>getTotalNecessidades(m));
+        const desejos = MONTHS.map(m=>getTotalDesejos(m));
+        const investimentos = MONTHS.map(m=>getTotalInvestimentosMensal(m));
+        const saldos = MONTHS.map(m=>getSaldo(m));
+        
+        let html = `<div class="card"><div class="card-title">📈 EVOLUÇÃO 2026</div><div class="chart-container"><canvas id="annualChart"></canvas></div></div>
+        <div class="card"><div class="card-title">📊 RESUMO ANUAL</div><div class="scrollable-table"> <table><thead><tr><th>Mês</th><th>Receita</th><th>Cartão</th><th>Necessidades</th><th>Desejos</th><th>Investimentos</th><th>Total</th><th>Saldo</th></tr></thead><tbody>${MONTHS.map((m,i)=>`<tr><td>${MONTH_NAMES[i]}</td><td>${formatCurrency(receitas[i])}</td><td>${formatCurrency(cartao[i])}</td><td>${formatCurrency(necessidades[i])}</td><td>${formatCurrency(desejos[i])}</td><td>${formatCurrency(investimentos[i])}</td><td>${formatCurrency(cartao[i]+necessidades[i]+desejos[i]+investimentos[i])}</td><td style="color:${saldos[i]>=0?'#06D6A0':'#EF476F'}">${formatCurrency(saldos[i])}</td></tr>`).join('')}</tbody></table></div></div>`;
+        
+        const totalReceita = receitas.reduce((a,b)=>a+b,0);
+        const totalNec = necessidades.reduce((a,b)=>a+b,0);
+        const totalDes = desejos.reduce((a,b)=>a+b,0);
+        const totalInv = investimentos.reduce((a,b)=>a+b,0);
+        
+        html += `<div class="card"><div class="card-title">📐 ANÁLISE 50/30/20 ANUAL</div><div class="indicators-grid">
+        <div class="indicator-card"><div class="indicator-title">Necessidades (50%)</div><div class="indicator-value">${formatCurrency(totalNec)}</div><div>${formatPercent(totalNec/totalReceita)} da receita</div><div>Meta: 50% (${formatCurrency(totalReceita*0.5)})</div><div class="${totalNec<=totalReceita*0.5?'status-ok':'status-warning'}">${totalNec<=totalReceita*0.5?'✅ OK':'⚠️ Acima'}</div></div>
+        <div class="indicator-card"><div class="indicator-title">Desejos (30%)</div><div class="indicator-value">${formatCurrency(totalDes)}</div><div>${formatPercent(totalDes/totalReceita)} da receita</div><div>Meta: 30% (${formatCurrency(totalReceita*0.3)})</div><div class="${totalDes<=totalReceita*0.3?'status-ok':'status-warning'}">${totalDes<=totalReceita*0.3?'✅ OK':'⚠️ Acima'}</div></div>
+        <div class="indicator-card"><div class="indicator-title">Investimentos (20%)</div><div class="indicator-value">${formatCurrency(totalInv)}</div><div>${formatPercent(totalInv/totalReceita)} da receita</div><div>Meta: 20% (${formatCurrency(totalReceita*0.2)})</div><div class="${totalInv>=totalReceita*0.2?'status-ok':'status-warning'}">${totalInv>=totalReceita*0.2?'✅ OK':'⚠️ Abaixo'}</div></div></div></div>`;
+        return { html, receitas, cartao, necessidades, desejos, investimentos };
+    }
+
+    function renderInvestimentos() {
+        function renderTipo(tipo, titulo, cor) {
+            const items = investments[tipo];
+            let html = `<div class="card"><div class="card-title" style="color:${cor}">${titulo}</div><div class="scrollable-table"> <table><thead>
+                            <tr><th>Ativo</th><th>Quantidade</th><th>Preço Médio</th><th>Valor Atual</th><th>Total Investido</th><th>Valorização</th><th>Ações</th></tr>
+                        </thead><tbody>`;
+            items.forEach((item, idx) => {
+                const investido = (item.quantidade || 1) * (item.preco_medio || item.valor_investido || 0);
+                const atual = (item.quantidade || 1) * (item.valor_atual || item.valor_investido || 0);
+                const variacao = atual - investido;
+                html += `<tr>
+                            <td class="text-left">${escapeHtml(item.nome)}</td>
+                            <td>${item.quantidade || '-'}</td>
+                            <td>${formatCurrency(item.preco_medio || item.valor_investido)}</td>
+                            <td>${formatCurrency(item.valor_atual || item.valor_investido)}</td>
+                            <td>${formatCurrency(investido)}</td>
+                            <td style="color:${variacao>=0?'#06D6A0':'#EF476F'}">${formatCurrency(variacao)}</td>
+                            <td>
+                                <span class="action-icons" onclick="editarInvestimento('${tipo}',${idx})">✏️</span>
+                                <span class="action-icons" onclick="excluirInvestimento('${tipo}',${idx})">🗑️</span>
+                            </td>
+                           </tr>`;
+            });
+            html += `<tr><td colspan="7"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px">
+                        <input type="text" id="novo_nome_${tipo}" placeholder="Nome">
+                        <input type="number" id="novo_qtde_${tipo}" placeholder="Quantidade" step="0.01">
+                        <input type="number" id="novo_preco_${tipo}" placeholder="Preço" step="0.01">
+                        <input type="number" id="novo_atual_${tipo}" placeholder="Atual" step="0.01">
+                        <button onclick="adicionarInvestimento('${tipo}')">+ Adicionar</button>
+                    </div></td></tr>
+                    </tbody>
+                </div></div>`;
+            return html;
+        }
+        let totalGeral = 0, totalInvestido = 0;
+        ['fiis','acoes','tesouro_direto'].forEach(t => { investments[t].forEach(i => { totalInvestido += (i.quantidade||1)*(i.preco_medio||i.valor_investido||0); totalGeral += (i.quantidade||1)*(i.valor_atual||i.valor_investido||0); }); });
+        return `<div class="card"><div class="card-title">💎 CARTEIRA DE INVESTIMENTOS</div><div class="indicators-grid">
+                    <div class="indicator-card"><div class="indicator-title">Total Investido</div><div class="indicator-value">${formatCurrency(totalInvestido)}</div></div>
+                    <div class="indicator-card"><div class="indicator-title">Valor Atual</div><div class="indicator-value" style="color:${totalGeral>=totalInvestido?'#06D6A0':'#EF476F'}">${formatCurrency(totalGeral)}</div></div>
+                    <div class="indicator-card"><div class="indicator-title">Rentabilidade</div><div class="indicator-value" style="color:${totalGeral>=totalInvestido?'#06D6A0':'#EF476F'}">${formatCurrency(totalGeral-totalInvestido)} (${formatPercent((totalGeral-totalInvestido)/totalInvestido)})</div></div>
+                </div></div>${renderTipo('fiis','🏢 Fundos Imobiliários','#FFD166')}${renderTipo('acoes','📈 Ações','#06D6A0')}${renderTipo('tesouro_direto','🏦 Tesouro Direto','#00B4D8')}`;
+    }
+
+    function renderGuia() {
+        return `<div class="card">
+                    <div class="card-title">📘 GUIA DO SISTEMA - REGRA 50/30/20</div>
+                    
+                    <div class="exemplo-box">
+                        <div class="exemplo-titulo">💰 COMO FUNCIONA A REGRA 50/30/20?</div>
+                        <p>Distribua sua renda mensal da seguinte forma:</p>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li><strong style="color: #00B4D8;">50% NECESSIDADES</strong> - Gastos essenciais para viver</li>
+                            <li><strong style="color: #FFD166;">30% DESEJOS</strong> - Gastos para lazer e conforto</li>
+                            <li><strong style="color: #06D6A0;">20% INVESTIMENTOS</strong> - Gastos para o futuro/liberdade financeira</li>
+                        </ul>
+                    </div>
+
+                    <div class="exemplo-box">
+                        <div class="exemplo-titulo">💳 COMO CLASSIFICAR OS GASTOS DO CARTÃO?</div>
+                        <p>Ao adicionar uma compra no cartão, selecione a categoria correta:</p>
+                        <table style="margin-top: 10px; width: 100%;">
+                            <thead><tr><th>Exemplo de Gasto</th><th>Categoria</th><th>Percentual</th></tr></thead>
+                            <tbody>
+                                <tr style="background: rgba(0,180,216,0.2);"><td>🛒 Mercado, 🏠 Aluguel, 💡 Contas, 🚗 Combustível</td><td>Necessidade</td><td>50%</td></tr>
+                                <tr style="background: rgba(255,209,102,0.2);"><td>📺 Netflix, 🍔 Restaurante, ✈️ Viagem, 👕 Roupas</td><td>Desejo</td><td>30%</td></tr>
+                                <tr style="background: rgba(6,214,160,0.2);"><td>📚 Cursos, 💻 Notebook p/ trabalho, 💎 Ações</td><td>Investimento</td><td>20%</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="exemplo-box">
+                        <div class="exemplo-titulo">🎯 EXEMPLO PRÁTICO</div>
+                        <p>Renda mensal: <strong>R$ 6.000</strong></p>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li><strong style="color: #00B4D8;">Necessidades (R$ 3.000 - 50%)</strong><br>
+                                Aluguel: R$ 1.500 • Mercado: R$ 800 • Contas: R$ 400 • Transporte: R$ 300</li>
+                            <li><strong style="color: #FFD166;">Desejos (R$ 1.800 - 30%)</strong><br>
+                                Streaming: R$ 90 • Restaurantes: R$ 400 • Viagem: R$ 500 • Lazer: R$ 810</li>
+                            <li><strong style="color: #06D6A0;">Investimentos (R$ 1.200 - 20%)</strong><br>
+                                Curso: R$ 300 • Ações: R$ 500 • Reserva Emergência: R$ 400</li>
+                        </ul>
+                    </div>
+
+                    <div class="exemplo-box">
+                        <div class="exemplo-titulo">⚡ FUNCIONALIDADES DO SISTEMA</div>
+                        <ul style="margin-left: 20px;">
+                            <li><strong>Inserção Rápida:</strong> Use os botões coloridos (50%/30%/20%) para adicionar gastos rapidamente</li>
+                            <li><strong>Replicação entre meses:</strong> Copie todos os itens de um mês para o próximo com 1 clique</li>
+                            <li><strong>Múltiplos Cartões:</strong> Gerencie vários cartões com limites diferentes</li>
+                            <li><strong>Classificação de compras:</strong> Ao adicionar uma compra no cartão, defina se é Necessidade/Desejo/Investimento</li>
+                            <li><strong>Backup de dados:</strong> Use os botões Exportar/Importar para segurança</li>
+                            <li><strong>Acompanhamento de investimentos:</strong> Controle FIIs, Ações e Tesouro Direto</li>
+                        </ul>
+                    </div>
+
+                    <div class="exemplo-box">
+                        <div class="exemplo-titulo">❓ PERGUNTAS FREQUENTES</div>
+                        <p><strong>🔹 Um gasto pode ser classificado de forma diferente?</strong><br>
+                        Sim! Por exemplo: Um notebook pode ser 20% se for para trabalho, mas 30% se for para lazer.</p>
+                        
+                        <p><strong>🔹 E se a soma dos percentuais não der exato?</strong><br>
+                        A regra é flexível. O importante é estar próximo: 45-55%, 25-35%, 15-25%.</p>
+                        
+                        <p><strong>🔹 Onde entram as parcelas do cartão?</strong><br>
+                        Cada parcela é contabilizada no mês em que vence, seguindo a categoria definida na compra.</p>
+                    </div>
+                </div>`;
+    }
+
+    window.toggleParcelas = function() {
+        const parcelasGroup = document.getElementById('parcelas_group');
+        if (parcelasGroup) {
+            parcelasGroup.style.display = document.getElementById('novo_tipo').value === 'parcelado' ? 'block' : 'none';
+        }
+    };
+
+    window.adicionarCompraCartao = function() {
+        if (!selectedCardId && creditCards.length === 0) {
+            showToast("Cadastre um cartão primeiro!", "erro");
+            return;
+        }
+        const nome = document.getElementById('nova_descricao')?.value;
+        const valor = parseFloat(document.getElementById('novo_valor')?.value);
+        const tipo = document.getElementById('novo_tipo')?.value;
+        const parcelas = tipo === 'parcelado' ? parseInt(document.getElementById('novo_parcelas')?.value) : 0;
+        const dataInicio = document.getElementById('novo_mes_inicio')?.value;
+        const categoria = document.getElementById('nova_categoria')?.value;
+        
+        if (!nome || isNaN(valor)) { showToast("Preencha todos os campos", "erro"); return; }
+        
+        creditCardExpenses.push({ 
+            id: Date.now(), 
+            cartaoId: selectedCardId, 
+            nome, 
+            valor, 
+            tipo, 
+            parcelas, 
+            parcelaAtual: 1, 
+            dataInicio, 
+            categoria: categoria 
+        });
+        saveAllData();
+        refreshCurrentTab();
+        showToast(`Compra "${nome}" adicionada como ${categoria === 'necessidade' ? 'Necessidade (50%)' : (categoria === 'desejo' ? 'Desejo (30%)' : 'Investimento (20%)')}!`);
+    };
+
+    window.excluirCompraCartao = function(id) { 
+        if(confirm('Excluir esta compra?')){ 
+            creditCardExpenses = creditCardExpenses.filter(e => e.id !== id);
+            saveAllData(); 
+            refreshCurrentTab(); 
+            showToast("Compra removida!");
+        } 
+    };
+
+    window.editarCompraCartao = function(id) {
+        const expense = creditCardExpenses.find(e => e.id === id);
+        if (!expense) return;
+        const n = prompt('Nova descrição:', expense.nome); if(n && n.trim()) expense.nome = n.trim();
+        const v = prompt('Novo valor:', expense.valor); if(v && !isNaN(parseFloat(v))) expense.valor = parseFloat(v);
+        saveAllData(); 
+        refreshCurrentTab();
+        showToast("Compra atualizada!");
+    };
+
+    window.atualizarReceita = function(mes, valor) { 
+        monthlyData[mes].receita = parseFloat(valor) || 0; 
+        saveAllData(); 
+        refreshCurrentTab(); 
+    };
+
+    window.adicionarItem = function(mes, categoria) {
+        const nomeInput = document.getElementById(`novo_nome_${categoria}_${mes}`);
+        const valorInput = document.getElementById(`novo_valor_${categoria}_${mes}`);
+        if (!nomeInput || !valorInput) { 
+            showToast("Erro ao encontrar campos do formulário", "erro"); 
+            return; 
+        }
+        const nome = nomeInput.value.trim();
+        const valor = parseFloat(valorInput.value);
+        if (!nome || isNaN(valor) || valor <= 0) { 
+            showToast("Preencha todos os campos corretamente", "erro"); 
+            return; 
+        }
+        if (!monthlyData[mes]) monthlyData[mes] = getDefaultMonthlyData(mes);
+        if (!monthlyData[mes][categoria]) monthlyData[mes][categoria] = [];
+        monthlyData[mes][categoria].push({ nome, valor });
+        saveAllData();
+        refreshCurrentTab();
+        showToast("Item adicionado!");
+    };
+
+    window.adicionarInvestimento = function(tipo) {
+        const nome = document.getElementById(`novo_nome_${tipo}`)?.value;
+        const quantidade = parseFloat(document.getElementById(`novo_qtde_${tipo}`)?.value);
+        const preco = parseFloat(document.getElementById(`novo_preco_${tipo}`)?.value);
+        const atual = parseFloat(document.getElementById(`novo_atual_${tipo}`)?.value);
+        if (!nome || isNaN(quantidade) || isNaN(preco) || isNaN(atual)) { 
+            showToast("Preencha todos os campos", "erro"); 
+            return; 
+        }
+        investments[tipo].push({ nome, quantidade, preco_medio: preco, valor_atual: atual });
+        saveAllData(); 
+        refreshCurrentTab();
+        showToast("Investimento adicionado!");
+    };
+
+    window.editarInvestimento = function(tipo, idx) {
+        const i = investments[tipo][idx];
+        if (!i) return;
+        const n = prompt('Nome:', i.nome); if(n && n.trim()) i.nome = n.trim();
+        const q = prompt('Quantidade:', i.quantidade); if(q && !isNaN(parseFloat(q))) i.quantidade = parseFloat(q);
+        const p = prompt('Preço médio:', i.preco_medio); if(p && !isNaN(parseFloat(p))) i.preco_medio = parseFloat(p);
+        const a = prompt('Valor atual:', i.valor_atual); if(a && !isNaN(parseFloat(a))) i.valor_atual = parseFloat(a);
+        saveAllData(); 
+        refreshCurrentTab();
+        showToast("Investimento atualizado!");
+    };
+
+    window.excluirInvestimento = function(tipo, idx) { 
+        if(confirm('Excluir este investimento?')){ 
+            investments[tipo].splice(idx,1); 
+            saveAllData(); 
+            refreshCurrentTab(); 
+            showToast("Investimento removido!");
+        } 
+    };
+
+    let chart1 = null, chart2 = null;
+
+    function initCharts() {
+        const proj = renderProjecaoMensal();
+        const anual = renderResumoAnual();
+        setTimeout(() => {
+            const ctx1 = document.getElementById('cardProjectionChart');
+            if(ctx1 && proj.projectionData) { 
+                if(chart1) chart1.destroy(); 
+                chart1 = new Chart(ctx1, { 
+                    type:'line', 
+                    data:{ 
+                        labels:MONTH_NAMES, 
+                        datasets:[{ 
+                            label:'Gastos no Cartão (Total)', 
+                            data:proj.projectionData, 
+                            borderColor:'#00B4D8', 
+                            backgroundColor:'rgba(0,180,216,0.1)', 
+                            tension:0.4, 
+                            fill:true 
+                        }] 
+                    }, 
+                    options:{ 
+                        responsive:true, 
+                        plugins:{ 
+                            tooltip:{ 
+                                callbacks:{ 
+                                    label:(ctx)=>`${ctx.dataset.label}: ${formatCurrency(ctx.raw)}` 
+                                } 
+                            } 
+                        }, 
+                        scales:{ 
+                            y:{ 
+                                ticks:{ 
+                                    callback:(v)=>formatCurrency(v) 
+                                } 
+                            } 
+                        } 
+                    } 
+                }); 
+            }
+            const ctx2 = document.getElementById('annualChart');
+            if(ctx2 && anual.receitas) { 
+                if(chart2) chart2.destroy(); 
+                chart2 = new Chart(ctx2, { 
+                    type:'line', 
+                    data:{ 
+                        labels:MONTH_NAMES, 
+                        datasets:[
+                            { label:'Receita', data:anual.receitas, borderColor:'#06D6A0', tension:0.4, fill:true, backgroundColor:'rgba(6,214,160,0.1)' },
+                            { label:'Gastos Cartão', data:anual.cartao, borderColor:'#00B4D8', tension:0.4 },
+                            { label:'Necessidades (50%)', data:anual.necessidades, borderColor:'#00B4D8', tension:0.4 },
+                            { label:'Desejos (30%)', data:anual.desejos, borderColor:'#FFD166', tension:0.4 },
+                            { label:'Investimentos (20%)', data:anual.investimentos, borderColor:'#06D6A0', tension:0.4 }
+                        ] 
+                    }, 
+                    options:{ 
+                        responsive:true, 
+                        plugins:{ 
+                            tooltip:{ 
+                                callbacks:{ 
+                                    label:(ctx)=>`${ctx.dataset.label}: ${formatCurrency(ctx.raw)}` 
+                                } 
+                            } 
+                        }, 
+                        scales:{ 
+                            y:{ 
+                                ticks:{ 
+                                    callback:(v)=>formatCurrency(v) 
+                                } 
+                            } 
+                        } 
+                    } 
+                }); 
+            }
+        }, 200);
+    }
+
+    function refreshCurrentTab() {
+        const activeTab = document.querySelector('.tab-btn.active');
+        if (activeTab) {
+            const tabId = activeTab.getAttribute('data-tab-id');
+            if (tabId === 'resumo') { 
+                const anual = renderResumoAnual(); 
+                document.getElementById('resumo').innerHTML = anual.html; 
+                initCharts(); 
+            }
+            else if (tabId === 'cartao') { 
+                document.getElementById('cartao').innerHTML = renderCreditCardManager(); 
+                const proj = renderProjecaoMensal(); 
+                document.getElementById('cartao').innerHTML += proj.html; 
+                initCharts(); 
+            }
+            else if (tabId === 'investimentos') { 
+                document.getElementById('investimentos').innerHTML = renderInvestimentos(); 
+            }
+            else if (tabId === 'guia') { 
+                document.getElementById('guia').innerHTML = renderGuia(); 
+            }
+            else if (tabId.startsWith('mes_')) { 
+                const mes = tabId.replace('mes_', ''); 
+                const idx = MONTHS.indexOf(mes);
+                currentMonthIndex = idx;
+                document.getElementById(tabId).innerHTML = renderDetalhamentoMensal(mes, MONTH_NAMES[idx]); 
+            }
+        }
+    }
+
+    function initTabs() {
+        loadInitialData();
+        const tabsContainer = document.getElementById('tabs');
+        const content = document.getElementById('content');
+        const tabItems = [
+            { id: 'resumo', label: '📊 Resumo Anual' },
+            { id: 'cartao', label: '💳 Gestão de Cartões' },
+            { id: 'investimentos', label: '💎 Investimentos' },
+            { id: 'guia', label: '📘 Guia' },
+            ...MONTHS.map((m,i) => ({ id: `mes_${m}`, label: `📅 ${MONTH_NAMES[i]}` }))
+        ];
+        
+        tabsContainer.innerHTML = '';
+        content.innerHTML = '';
+        
+        tabItems.forEach(tab => {
+            const btn = document.createElement('button');
+            btn.className = 'tab-btn';
+            btn.textContent = tab.label;
+            btn.setAttribute('data-tab-id', tab.id);
+            btn.onclick = () => { 
+                document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); 
+                btn.classList.add('active'); 
+                document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active')); 
+                document.getElementById(tab.id).classList.add('active'); 
+                refreshCurrentTab(); 
+            };
+            tabsContainer.appendChild(btn);
+        });
+        
+        tabItems.forEach(tab => {
+            const div = document.createElement('div');
+            div.id = tab.id;
+            div.className = 'tab-content';
+            if (tab.id === 'resumo') div.innerHTML = renderResumoAnual().html;
+            else if (tab.id === 'cartao') div.innerHTML = renderCreditCardManager() + renderProjecaoMensal().html;
+            else if (tab.id === 'investimentos') div.innerHTML = renderInvestimentos();
+            else if (tab.id === 'guia') div.innerHTML = renderGuia();
+            else { 
+                const mes = tab.id.replace('mes_',''); 
+                const idx = MONTHS.indexOf(mes); 
+                div.innerHTML = renderDetalhamentoMensal(mes, MONTH_NAMES[idx]); 
+            }
+            content.appendChild(div);
+        });
+        
+        const firstBtn = document.querySelector('.tab-btn');
+        if (firstBtn) {
+            firstBtn.classList.add('active');
+            document.getElementById('resumo').classList.add('active');
+        }
+        setTimeout(() => { 
+            initCharts(); 
+            atualizarStorageBar(); 
+        }, 300);
+    }
+    
+    initTabs();
+</script>
+</body>
+</html>
